@@ -96,7 +96,7 @@ func (inbox *Inbox) Sync() error {
 			inbox.PendingRequestsTotal = resp.Inbox.PendingRequestsTotal
 			inbox.SnapshotAtMs = resp.Inbox.SnapshotAtMs
 			for i := range inbox.Conversations {
-				inbox.Conversations[i].inst = insta
+				inbox.Conversations[i].Inst = insta
 				inbox.Conversations[i].firstRun = true
 			}
 		}
@@ -137,7 +137,7 @@ func (inbox *Inbox) Next() bool {
 			inbox.PendingRequestsTotal = resp.Inbox.PendingRequestsTotal
 			inbox.SnapshotAtMs = resp.Inbox.SnapshotAtMs
 			for i := range inbox.Conversations {
-				inbox.Conversations[i].inst = insta
+				inbox.Conversations[i].Inst = insta
 				inbox.Conversations[i].firstRun = true
 			}
 			if inbox.Cursor == "" || !inbox.HasOlder {
@@ -151,7 +151,7 @@ func (inbox *Inbox) Next() bool {
 }
 
 type Conversation struct {
-	inst     *Instagram
+	Inst     *Instagram
 	err      error
 	firstRun bool
 
@@ -206,7 +206,7 @@ func (c Conversation) lastItemID() string {
 //
 // See example: examples/media/likeAll.go
 func (c *Conversation) Like() error {
-	insta := c.inst
+	insta := c.Inst
 	to, err := prepareRecipients(c)
 	if err != nil {
 		return err
@@ -240,7 +240,7 @@ func (c *Conversation) Like() error {
 //
 // See example: examples/inbox/sms.go
 func (c *Conversation) Send(text string) error {
-	insta := c.inst
+	insta := c.Inst
 	// I DON'T KNOW WHY BUT INSTAGRAM WANTS A DOUBLE SLICE OF INTS FOR ONE ID.
 	to, err := prepareRecipients(c)
 	if err != nil {
@@ -291,7 +291,7 @@ func (c *Conversation) Next() bool {
 		return true
 	}
 
-	insta := c.inst
+	insta := c.Inst
 	body, err := insta.sendRequest(
 		&reqOptions{
 			Endpoint: fmt.Sprintf(urlInboxThread, c.ID),
@@ -307,7 +307,7 @@ func (c *Conversation) Next() bool {
 		err = json.Unmarshal(body, &resp)
 		if err == nil {
 			*c = resp.Conversation
-			c.inst = insta
+			c.Inst = insta
 			if !c.HasOlder {
 				c.err = ErrNoMore
 			}
